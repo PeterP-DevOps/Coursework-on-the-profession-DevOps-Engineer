@@ -1,0 +1,11 @@
+- name: Deploy Monitoring Stack
+  hosts: all
+  become: yes
+  vars:
+    prometheus_targets:
+      - "10.0.2.15:9100"
+      - "10.0.3.26:9100"
+  roles:
+    - { role: node_exporter, when: "'webservers' in group_names" }
+    - { role: nginx_exporter, when: "'webservers' in group_names" }
+    - { role: prometheus, when: "'monitoring' in group_names" }

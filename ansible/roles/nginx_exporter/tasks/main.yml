@@ -1,0 +1,16 @@
+- name: Install Nginx Exporter
+  apt:
+    name: prometheus-nginx-exporter
+    state: present
+
+- name: Configure Nginx Exporter
+  copy:
+    dest: /etc/default/prometheus-nginx-exporter
+    content: |
+      NGINX_STATUS_URL=http://localhost/nginx_status
+
+- name: Enable and start Nginx Exporter
+  systemd:
+    name: prometheus-nginx-exporter
+    enabled: yes
+    state: started
