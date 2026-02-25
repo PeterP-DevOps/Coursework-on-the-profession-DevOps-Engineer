@@ -66,5 +66,4 @@ Cоздайте ВМ, разверните на ней Elasticsearch. Устан
 4. Устанавливаем Интерфейс командной строки Yandex Cloud (CLI):  
 `curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash`  
 5. Создаём базовую структуру Terraform:  
-`mkdir -p terraform/{network,security,compute}`  
-
+`mkdir -p terraform/{network,security,compute}` 
