@@ -1,0 +1,17 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.backup
+
+# Ansible
+*.retry
+
+# Общие
+.DS_Store
+*.log
+.vscode/
+.idea/
+__pycache__/
+*.pyc

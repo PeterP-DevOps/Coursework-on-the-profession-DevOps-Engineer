@@ -1,0 +1,27 @@
+- name: Install Kibana
+  apt:
+    name: kibana
+    state: present
+    update_cache: yes
+
+- name: Configure Kibana
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+  notify:
+    - restart kibana
+
+- name: Ensure Kibana is running
+  systemd:
+    name: kibana
+    state: started
+    enabled: yes
+
+- name: Wait for Kibana to be available
+  uri:
+    url: http://localhost:5601
+    status_code: 200
+  register: kibana_health
+  retries: 10
+  delay: 5
+  until: kibana_health.status == 200

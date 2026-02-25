@@ -1,0 +1,70 @@
+- name: Remove conflicting Elasticsearch 8.x repository
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/8.x/apt stable main"
+    state: absent
+    update_cache: yes
+
+- name: Download Elasticsearch 7.x .deb package on control node
+  get_url:
+    url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.17.24-amd64.deb"
+    dest: "/tmp/elasticsearch-7.17.24-amd64.deb"
+    mode: '0644'
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy .deb package to remote host
+  copy:
+    src: "/tmp/elasticsearch-7.17.24-amd64.deb"
+    dest: "/tmp/elasticsearch.deb"
+    mode: '0644'
+
+- name: Install dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - gnupg
+    state: present
+    update_cache: yes
+
+- name: Install Elasticsearch from local .deb package
+  apt:
+    deb: "/tmp/elasticsearch.deb"
+    state: present
+
+- name: Remove temporary .deb file
+  file:
+    path: "/tmp/elasticsearch.deb"
+    state: absent
+
+- name: Configure Elasticsearch (single node)
+  lineinfile:
+    path: /etc/elasticsearch/elasticsearch.yml
+    line: "{{ item }}"
+  loop:
+    - "network.host: 0.0.0.0"
+    - "discovery.type: single-node"
+    - "cluster.name: my-elasticsearch-cluster"
+    - "node.name: node-1"
+
+- name: Adjust JVM heap size
+  lineinfile:
+    path: /etc/elasticsearch/jvm.options
+    regexp: "^-X(ms|mx)"
+    line: "-Xms512m\n-Xmx512m"
+    backup: yes
+
+- name: Enable and start Elasticsearch
+  systemd:
+    name: elasticsearch
+    enabled: yes
+    state: started
+
+- name: Wait for Elasticsearch to be ready
+  uri:
+    url: http://localhost:9200/
+    timeout: 30
+    status_code: 200
+  register: elastic_status
+  until: elastic_status.status == 200
+  retries: 10
+  delay: 10

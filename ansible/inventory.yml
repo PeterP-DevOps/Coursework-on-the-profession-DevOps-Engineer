@@ -1,19 +1,32 @@
 all:
+  vars:
+    ansible_user: ubuntu
+    ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_common_args: >
+      -o ProxyJump=ubuntu@93.77.179.155
+      -o StrictHostKeyChecking=no
+
   children:
+
     webservers:
       hosts:
         web-1:
           ansible_host: 10.0.2.15
-          ansible_user: ubuntu
         web-2:
           ansible_host: 10.0.3.26
-          ansible_user: ubuntu
+
     monitoring:
       hosts:
         prometheus:
-          ansible_host: 10.0.3.30
-          ansible_user: ubuntu
+          ansible_host: 10.0.2.18
 
-# Доступ через bastion
-  vars:
-    ansible_ssh_common_args: '-o ProxyJump=ubuntu@<BASTION_PUBLIC_IP>'
+    elasticsearch_group:
+      hosts:
+        elasticsearch:
+          ansible_host: 10.0.2.25
+
+    kibana_group:
+      hosts:
+        kibana:
+          ansible_host: 10.0.0.24

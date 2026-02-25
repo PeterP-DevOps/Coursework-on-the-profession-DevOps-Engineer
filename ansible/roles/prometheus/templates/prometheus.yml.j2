@@ -2,9 +2,27 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'node_exporter'
+
+  - job_name: 'prometheus'
     static_configs:
-      - targets: {{ prometheus_targets | join(',') }}
-  - job_name: 'nginx_exporter'
+      - targets: ['localhost:9090']
+
+  - job_name: 'node_exporters'
     static_configs:
-      - targets: {{ prometheus_targets | join(',') }}
+      - targets:
+{% for host in groups['webservers'] %}
+        - '{{ hostvars[host].ansible_host }}:9100'
+{% endfor %}
+{% for host in groups['monitoring'] %}
+        - '{{ hostvars[host].ansible_host }}:9100'
+{% endfor %}
+{% for host in groups['elasticsearch_group'] %}
+        - '{{ hostvars[host].ansible_host }}:9100'
+{% endfor %}
+
+  - job_name: 'nginx_exporters'
+    static_configs:
+      - targets:
+{% for host in groups['webservers'] %}
+        - '{{ hostvars[host].ansible_host }}:9113'
+{% endfor %}

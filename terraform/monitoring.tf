@@ -16,9 +16,10 @@ resource "yandex_compute_instance" "prometheus" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.private_a.id
-    security_group_ids = [yandex_vpc_security_group.prometheus_sg.id]
-    nat                = false
+  subnet_id = yandex_vpc_subnet.private_a.id
+  ip_address = "10.0.2.18"
+  nat = false
+  security_group_ids = [yandex_vpc_security_group.web.id]
   }
 
   metadata = {

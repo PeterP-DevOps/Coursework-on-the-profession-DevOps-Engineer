@@ -1,0 +1,21 @@
+- name: Copy Filebeat deb package to host
+  copy:
+    src: filebeat-7.17.29-amd64.deb
+    dest: /tmp/filebeat.deb
+
+- name: Install Filebeat
+  apt:
+    deb: /tmp/filebeat.deb
+
+- name: Configure Filebeat
+  template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+  notify:
+    - restart filebeat
+
+- name: Enable and start Filebeat
+  systemd:
+    name: filebeat
+    enabled: yes
+    state: started

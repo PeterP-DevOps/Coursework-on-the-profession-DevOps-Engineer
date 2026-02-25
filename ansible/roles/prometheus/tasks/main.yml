@@ -16,7 +16,11 @@
     enabled: yes
     state: started
 
-- name: restart prometheus
-  systemd:
-    name: prometheus
-    state: restarted
+- name: Wait for Prometheus to be available
+  uri:
+    url: http://localhost:9090/-/ready
+    status_code: 200
+  register: prom_health
+  retries: 10
+  delay: 5
+  until: prom_health.status == 200

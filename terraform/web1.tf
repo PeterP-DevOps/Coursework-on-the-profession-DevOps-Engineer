@@ -23,9 +23,10 @@ resource "yandex_compute_instance" "web1" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.private_a.id
-    nat                = false
-    security_group_ids = [yandex_vpc_security_group.web.id]
+  subnet_id = yandex_vpc_subnet.private_a.id
+  ip_address = "10.0.2.15"
+  nat = false
+  security_group_ids = [yandex_vpc_security_group.web.id]
   }
 
   metadata = {

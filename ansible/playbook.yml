@@ -1,3 +1,34 @@
+---
+- name: Deploy Node and Nginx Exporters
+  hosts: webservers
+  become: yes
+  roles:
+    - node_exporter
+    - nginx_exporter
+    - filebeat
+
+- name: Deploy Prometheus
+  hosts: monitoring
+  become: yes
+  vars:
+    prometheus_targets:
+      - "10.0.2.15:9100"
+      - "10.0.3.26:9100"
+  roles:
+    - prometheus
+
+- name: Deploy Elasticsearch
+  hosts: elasticsearch
+  become: yes
+  roles:
+    - elasticsearch
+
+- name: Deploy Kibana
+  hosts: kibana
+  become: yes
+  roles:
+    - kibana
+
 - name: Deploy Monitoring Stack
   hosts: all
   become: yes
@@ -5,7 +36,9 @@
     prometheus_targets:
       - "10.0.2.15:9100"
       - "10.0.3.26:9100"
+    elasticsearch_host: 10.0.2.20
   roles:
     - { role: node_exporter, when: "'webservers' in group_names" }
     - { role: nginx_exporter, when: "'webservers' in group_names" }
+    - { role: filebeat, when: "'webservers' in group_names" }
     - { role: prometheus, when: "'monitoring' in group_names" }

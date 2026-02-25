@@ -6,6 +6,7 @@ resource "yandex_compute_instance" "bastion" {
   name = "bastion"
   zone = "ru-central1-a"
 
+
   resources {
   cores = 2
   memory = 2
@@ -20,9 +21,14 @@ resource "yandex_compute_instance" "bastion" {
   }
 
   network_interface {
-    subnet_id          = yandex_vpc_subnet.public_a.id
-    nat                = true
-    security_group_ids = [yandex_vpc_security_group.bastion.id]
+  subnet_id = yandex_vpc_subnet.public_a.id
+  nat       = true
+  ip_address = "10.0.0.14"
+  nat_ip_address = yandex_vpc_address.bastion_static_ip.external_ipv4_address[0].address
+
+  security_group_ids = [
+    yandex_vpc_security_group.bastion.id
+  ]
   }
 
   metadata = {
